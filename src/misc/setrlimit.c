@@ -46,6 +46,24 @@ int setrlimit(int resource, const struct rlimit *rlim)
 	}
 	return 0;
 #else
-	return __syscall_ret(ret);
+#define BLUEY_SYS_SETRLIMIT 191
+	if (ret != -ENOSYS) return __syscall_ret(ret);
+
+	unsigned int klim32[2];
+	klim32[0] = (rlim->rlim_cur >= RLIM_INFINITY) ? 0xFFFFFFFFu : (unsigned int)rlim->rlim_cur;
+	klim32[1] = (rlim->rlim_max >= RLIM_INFINITY) ? 0xFFFFFFFFu : (unsigned int)rlim->rlim_max;
+	long r2;
+	__asm__ volatile (
+		"int $0x80"
+		: "=a" (r2)
+		: "0" ((long)BLUEY_SYS_SETRLIMIT), "b" ((long)resource), "c" ((long)(uintptr_t)klim32)
+		: "memory"
+	);
+	if (r2 < 0) {
+		errno = -r2;
+		return -1;
+	}
+	return 0;
+#undef BLUEY_SYS_SETRLIMIT
 #endif
 }
