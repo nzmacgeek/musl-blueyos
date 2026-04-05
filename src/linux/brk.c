@@ -5,5 +5,13 @@
 
 int brk(void *end)
 {
-	return __syscall_ret(-ENOMEM);
+	void *result;
+	__asm__ volatile (
+		"int $0x80"
+		: "=a"(result)
+		: "0"(SYS_brk), "b"(end)
+		: "memory"
+	);
+	if (result < end) { errno = ENOMEM; return -1; }
+	return 0;
 }
