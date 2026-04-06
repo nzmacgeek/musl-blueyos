@@ -1,0 +1,65 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout musl-blueyos
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc gcc-multilib make
+
+      - name: Configure musl for i386
+        run: |
+          ./configure \
+            --prefix=/usr/local/musl \
+            --syslibdir=/lib \
+            CC="gcc -m32" \
+            --target=i386-linux-musl
+
+      - name: Build musl
+        run: make -j$(nproc)
+
+      - name: Stage install tree into pkg/payload
+        run: make install DESTDIR="$(pwd)/pkg/payload"
+
+      - name: Set up Go (for dpkbuild)
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Build dpkbuild from source
+        run: |
+          git clone --depth=1 https://github.com/nzmacgeek/dimsim /tmp/dimsim
+          cd /tmp/dimsim
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+            go build -ldflags "-w -s" -o /usr/local/bin/dpkbuild ./cmd/dpkbuild
+
+      - name: Build .dpk package
+        run: dpkbuild build pkg/
+
+      - name: Upload .dpk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: musl-dpk
+          path: '*.dpk'
+
+      - name: Create GitHub release and attach .dpk
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "musl ${{ github.ref_name }}" \
+            --notes "musl libc ${{ github.ref_name }} for BlueyOS (i386)" \
+            *.dpk

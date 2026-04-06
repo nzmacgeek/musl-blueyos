@@ -1,0 +1,12 @@
+{
+  "name": "musl",
+  "version": "1.2.6",
+  "arch": "i386",
+  "description": "musl libc — the C standard library for BlueyOS",
+  "depends": [],
+  "recommends": [],
+  "conflicts": [],
+  "provides": ["libc>=1.2"],
+  "maintainer": "nzmacgeek <nzmacgeek@users.noreply.github.com>",
+  "homepage": "https://github.com/nzmacgeek/musl-blueyos"
+}

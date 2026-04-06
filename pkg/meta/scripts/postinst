@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+# Update the dynamic linker cache if ldconfig is available
+ldconfig 2>/dev/null || true
+exit 0
