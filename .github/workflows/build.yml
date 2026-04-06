@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout musl-blueyos
@@ -43,10 +45,10 @@ jobs:
           git clone --depth=1 https://github.com/nzmacgeek/dimsim /tmp/dimsim
           cd /tmp/dimsim
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-            go build -ldflags "-w -s" -o /usr/local/bin/dpkbuild ./cmd/dpkbuild
+            go build -ldflags "-w -s" -o /tmp/dpkbuild ./cmd/dpkbuild
 
       - name: Build .dpk package
-        run: dpkbuild build pkg/
+        run: /tmp/dpkbuild build pkg/
 
       - name: Upload .dpk artifact
         uses: actions/upload-artifact@v4
