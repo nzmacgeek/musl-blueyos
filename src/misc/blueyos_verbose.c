@@ -13,7 +13,7 @@ static volatile int __blueyos_verbose_cached = -1;
 
 static int __read_verbose_level(void)
 {
-	char buf[512];
+	char buf[4096];
 	int fd, n;
 	const char *p;
 
@@ -34,8 +34,9 @@ static int __read_verbose_level(void)
 	while (*p) {
 		if (!strncmp(p, "verbose=", 8)) {
 			int level = p[8] - '0';
-			if (level >= 0 && level <= 9)
+			if (level >= BLUEYOS_VERBOSE_QUIET && level <= BLUEYOS_VERBOSE_DEBUG)
 				return level;
+			/* Out-of-range value: fall through to default. */
 		}
 		/* Advance past the current token. */
 		while (*p && *p != ' ' && *p != '\t' && *p != '\n')
