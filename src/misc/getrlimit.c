@@ -3,7 +3,7 @@
 #include "syscall.h"
 
 /* BlueyOS fallback: kernel expects two 32-bit rlimit fields and exposes
- * syscall number 190 for getrlimit. Provide a tiny int0x80 wrapper so
+ * syscall number 191 (ugetrlimit on i386) for getrlimit. Provide a tiny int0x80 wrapper so
  * musl can call it when other syscalls are unavailable.
  */
 static inline long __blueyos_syscall2(long n, long a1, long a2)
@@ -39,7 +39,7 @@ int getrlimit(int resource, struct rlimit *rlim)
 	FIX(rlim->rlim_max);
 	return 0;
 #else
-#define BLUEY_SYS_GETRLIMIT 190
+#define BLUEY_SYS_GETRLIMIT 191
 	if (!ret || errno != ENOSYS)
 		return ret;
 

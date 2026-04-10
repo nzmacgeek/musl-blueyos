@@ -5,8 +5,9 @@
 
 pid_t vfork(void)
 {
-	/* vfork syscall cannot be made from C code */
-#ifdef SYS_fork
+	#ifdef SYS_vfork
+	return syscall(SYS_vfork);
+	#elif defined(SYS_fork)
 	return syscall(SYS_fork);
 #else
 	return syscall(SYS_clone, SIGCHLD, 0);

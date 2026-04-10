@@ -46,7 +46,7 @@ int setrlimit(int resource, const struct rlimit *rlim)
 	}
 	return 0;
 #else
-#define BLUEY_SYS_SETRLIMIT 191
+#define BLUEY_SYS_SETRLIMIT 75
 	if (ret != -ENOSYS) return __syscall_ret(ret);
 
 	unsigned int klim32[2];

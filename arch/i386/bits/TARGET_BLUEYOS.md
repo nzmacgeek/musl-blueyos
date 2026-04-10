@@ -49,19 +49,37 @@ The following is a snippet from the `kernel/syscall/syscall.h` file, which defin
 #define SYS_WAIT4         114
 #define SYS_SCHED_YIELD   158
 #define SYS_NANOSLEEP     162
+#define SYS_FCHDIR        133
 #define SYS_EXIT_GROUP    252
 #define SYS_SET_TID_ADDRESS 258
 #define SYS_GETRANDOM     355
+#define SYS_GETGID32      200
+#define SYS_GETEUID32     201
+#define SYS_GETEGID32     202
+#define SYS_SETREUID32    203
+#define SYS_SETREGID32    204
+#define SYS_GETGROUPS32   205
+#define SYS_SETGROUPS32   206
+#define SYS_FCHOWN32      207
+#define SYS_SETRESUID32   208
+#define SYS_GETRESUID32   209
+#define SYS_SETRESGID32   210
+#define SYS_GETRESGID32   211
+#define SYS_CHOWN32       212
+#define SYS_SETUID32      213
+#define SYS_SETGID32      214
+#define SYS_SETFSUID32    215
+#define SYS_SETFSGID32    216
 // Process groups
-#define SYS_SETPGID       200
-#define SYS_GETPGID       201
-#define SYS_GETPGRP       202
+#define SYS_SETPGID       1000
+#define SYS_GETPGID       1001
+#define SYS_GETPGRP       1002
 // Mount / unmount
 #define SYS_UMOUNT2       52
 // Poll (event multiplexing for supervision and sockets)
 #define SYS_POLL          168
 // Device event channel
-#define SYS_DEVEV_OPEN    203
+#define SYS_DEVEV_OPEN    1003
 // Reboot / poweroff
 #define SYS_REBOOT        88
 ```

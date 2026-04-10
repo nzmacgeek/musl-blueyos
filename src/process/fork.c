@@ -5,6 +5,8 @@
 #include "pthread_impl.h"
 #include "fork_impl.h"
 
+pid_t vfork(void);
+
 static volatile int *const dummy_lockptr = 0;
 
 weak_alias(dummy_lockptr, __at_quick_exit_lockptr);
@@ -63,6 +65,15 @@ pid_t fork(void)
 	pthread_t self=__pthread_self(), next=self->next;
 	pid_t ret = _Fork();
 	int errno_save = errno;
+	/* Some minimal kernels reject the clone() flags used by fork() with EPERM.
+	 * In that case, fall back to vfork(), which uses CLONE_VFORK|CLONE_VM and
+	 * is supported by small kernels. The caller must ensure the child does not
+	 * call non-async-signal-safe libc functions before execve/_exit when using
+	 * vfork semantics. */
+	if (ret < 0 && errno == EPERM) {
+		ret = vfork();
+		errno_save = errno;
+	}
 	if (need_locks) {
 		if (!ret) {
 			for (pthread_t td=next; td!=self; td=td->next)
