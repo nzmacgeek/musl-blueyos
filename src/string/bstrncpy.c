@@ -23,11 +23,12 @@ int bstrncpy(char *dest, const char *src, size_t dest_size)
 	}
 
 	/*
-	 * Use strlen to find the true end of src, naturally stopping at any
-	 * embedded NUL byte.  This prevents accidentally treating binary data
-	 * past an early NUL as part of the string.
+	 * Use strnlen to find the end of src, looking at most dest_size bytes.
+	 * This naturally stops at any embedded NUL byte (preventing treatment of
+	 * binary data past an early NUL as part of the string) while avoiding a
+	 * full traversal of very long strings when dest_size is small.
 	 */
-	slen = strlen(src);
+	slen = strnlen(src, dest_size);
 
 	if (slen < dest_size) {
 		/* src fits: copy slen bytes plus the NUL terminator. */
